@@ -5,10 +5,10 @@ namespace CityHotelGarage.Business.Operations.Interfaces;
 
 public interface IHotelService
 {
-    Task<ServiceResult<IEnumerable<HotelDto>>> GetAllHotelsAsync();
-    Task<ServiceResult<HotelDto>> GetHotelByIdAsync(int id);
-    Task<ServiceResult<IEnumerable<HotelDto>>> GetHotelsByCityAsync(int cityId);
-    Task<ServiceResult<HotelDto>> CreateHotelAsync(HotelCreateDto hotelDto);
-    Task<ServiceResult<HotelDto>> UpdateHotelAsync(int id, HotelCreateDto hotelDto);
-    Task<ServiceResult> DeleteHotelAsync(int id);
+    Task<Result<IEnumerable<HotelDto>>> GetAllHotelsAsync();
+    Task<Result<HotelDto>> GetHotelByIdAsync(int id);
+    Task<Result<IEnumerable<HotelDto>>> GetHotelsByCityAsync(int cityId);
+    Task<Result<HotelDto>> CreateHotelAsync(HotelCreateDto hotelDto);
+    Task<Result<HotelDto>> UpdateHotelAsync(int id, HotelCreateDto hotelDto);
+    Task<Result> DeleteHotelAsync(int id);
 }

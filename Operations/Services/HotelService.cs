@@ -22,7 +22,7 @@ public class HotelService : IHotelService
         _mapper = mapper;
     }
 
-    public async Task<ServiceResult<IEnumerable<HotelDto>>> GetAllHotelsAsync()
+    public async Task<Result<IEnumerable<HotelDto>>> GetAllHotelsAsync()
     {
         try
         {
@@ -30,15 +30,15 @@ public class HotelService : IHotelService
                 .ProjectToHotelDto(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return ServiceResult<IEnumerable<HotelDto>>.Success(hotelDtos, "Oteller başarıyla getirildi.");
+            return Result<IEnumerable<HotelDto>>.Success(hotelDtos, "Oteller başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<IEnumerable<HotelDto>>.Failure($"Oteller getirilirken hata oluştu: {ex.Message}");
+            return Result<IEnumerable<HotelDto>>.Failure($"Oteller getirilirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<HotelDto>> GetHotelByIdAsync(int id)
+    public async Task<Result<HotelDto>> GetHotelByIdAsync(int id)
     {
         try
         {
@@ -49,18 +49,18 @@ public class HotelService : IHotelService
 
             if (hotelDto == null)
             {
-                return ServiceResult<HotelDto>.Failure("Otel bulunamadı.");
+                return Result<HotelDto>.Failure("Otel bulunamadı.");
             }
 
-            return ServiceResult<HotelDto>.Success(hotelDto, "Otel başarıyla getirildi.");
+            return Result<HotelDto>.Success(hotelDto, "Otel başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<HotelDto>.Failure($"Otel getirilirken hata oluştu: {ex.Message}");
+            return Result<HotelDto>.Failure($"Otel getirilirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<IEnumerable<HotelDto>>> GetHotelsByCityAsync(int cityId)
+    public async Task<Result<IEnumerable<HotelDto>>> GetHotelsByCityAsync(int cityId)
     {
         try
         {
@@ -68,15 +68,15 @@ public class HotelService : IHotelService
                 .ProjectToHotelDto(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return ServiceResult<IEnumerable<HotelDto>>.Success(hotelDtos, "Şehirdeki oteller başarıyla getirildi.");
+            return Result<IEnumerable<HotelDto>>.Success(hotelDtos, "Şehirdeki oteller başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<IEnumerable<HotelDto>>.Failure($"Şehirdeki oteller getirilirken hata oluştu: {ex.Message}");
+            return Result<IEnumerable<HotelDto>>.Failure($"Şehirdeki oteller getirilirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<HotelDto>> CreateHotelAsync(HotelCreateDto hotelDto)
+    public async Task<Result<HotelDto>> CreateHotelAsync(HotelCreateDto hotelDto)
     {
         try
         {
@@ -84,7 +84,7 @@ public class HotelService : IHotelService
             var cityExists = await _cityRepository.ExistsAsync(hotelDto.CityId);
             if (!cityExists)
             {
-                return ServiceResult<HotelDto>.Failure("Belirtilen şehir bulunamadı.");
+                return Result<HotelDto>.Failure("Belirtilen şehir bulunamadı.");
             }
 
             // AutoMapper ile DTO'yu Entity'e çevir
@@ -97,29 +97,29 @@ public class HotelService : IHotelService
                 .ProjectToHotelDto(_mapper.ConfigurationProvider)
                 .FirstAsync();
 
-            return ServiceResult<HotelDto>.Success(resultDto, "Otel başarıyla oluşturuldu.");
+            return Result<HotelDto>.Success(resultDto, "Otel başarıyla oluşturuldu.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<HotelDto>.Failure($"Otel oluşturulurken hata oluştu: {ex.Message}");
+            return Result<HotelDto>.Failure($"Otel oluşturulurken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<HotelDto>> UpdateHotelAsync(int id, HotelCreateDto hotelDto)
+    public async Task<Result<HotelDto>> UpdateHotelAsync(int id, HotelCreateDto hotelDto)
     {
         try
         {
             var existingHotel = await _hotelRepository.GetByIdAsync(id);
             if (existingHotel == null)
             {
-                return ServiceResult<HotelDto>.Failure("Güncellenecek otel bulunamadı.");
+                return Result<HotelDto>.Failure("Güncellenecek otel bulunamadı.");
             }
 
             // Şehir var mı kontrol et
             var cityExists = await _cityRepository.ExistsAsync(hotelDto.CityId);
             if (!cityExists)
             {
-                return ServiceResult<HotelDto>.Failure("Belirtilen şehir bulunamadı.");
+                return Result<HotelDto>.Failure("Belirtilen şehir bulunamadı.");
             }
 
             // AutoMapper ile güncelleme
@@ -132,35 +132,35 @@ public class HotelService : IHotelService
                 .ProjectToHotelDto(_mapper.ConfigurationProvider)
                 .FirstAsync();
 
-            return ServiceResult<HotelDto>.Success(resultDto, "Otel başarıyla güncellendi.");
+            return Result<HotelDto>.Success(resultDto, "Otel başarıyla güncellendi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<HotelDto>.Failure($"Otel güncellenirken hata oluştu: {ex.Message}");
+            return Result<HotelDto>.Failure($"Otel güncellenirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult> DeleteHotelAsync(int id)
+    public async Task<Result> DeleteHotelAsync(int id)
     {
         try
         {
             var exists = await _hotelRepository.ExistsAsync(id);
             if (!exists)
             {
-                return ServiceResult.Failure("Silinecek otel bulunamadı.");
+                return Result.Failure("Silinecek otel bulunamadı.");
             }
 
             var deleted = await _hotelRepository.DeleteAsync(id);
             if (!deleted)
             {
-                return ServiceResult.Failure("Otel silinirken hata oluştu.");
+                return Result.Failure("Otel silinirken hata oluştu.");
             }
 
-            return ServiceResult.Success("Otel başarıyla silindi.");
+            return Result.Success("Otel başarıyla silindi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult.Failure($"Otel silinirken hata oluştu: {ex.Message}");
+            return Result.Failure($"Otel silinirken hata oluştu: {ex.Message}");
         }
     }
 }

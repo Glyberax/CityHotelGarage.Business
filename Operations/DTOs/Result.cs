@@ -1,15 +1,15 @@
 namespace CityHotelGarage.Business.Operations.Results;
 
-public class ServiceResult<T>
+public class Result<T>
 {
     public bool IsSuccess { get; set; }
     public string Message { get; set; } = "";
     public T? Data { get; set; }
     public List<string> Errors { get; set; } = new();
 
-    public static ServiceResult<T> Success(T data, string message = "")
+    public static Result<T> Success(T data, string message = "")
     {
-        return new ServiceResult<T>
+        return new Result<T>
         {
             IsSuccess = true,
             Data = data,
@@ -17,9 +17,9 @@ public class ServiceResult<T>
         };
     }
 
-    public static ServiceResult<T> Failure(string message, List<string>? errors = null)
+    public static Result<T> Failure(string message, List<string>? errors = null)
     {
-        return new ServiceResult<T>
+        return new Result<T>
         {
             IsSuccess = false,
             Message = message,
@@ -28,24 +28,24 @@ public class ServiceResult<T>
     }
 }
 
-public class ServiceResult
+public class Result
 {
     public bool IsSuccess { get; set; }
     public string Message { get; set; } = "";
     public List<string> Errors { get; set; } = new();
 
-    public static ServiceResult Success(string message = "")
+    public static Result Success(string message = "")
     {
-        return new ServiceResult
+        return new Result
         {
             IsSuccess = true,
             Message = message
         };
     }
 
-    public static ServiceResult Failure(string message, List<string>? errors = null)
+    public static Result Failure(string message, List<string>? errors = null)
     {
-        return new ServiceResult
+        return new Result
         {
             IsSuccess = false,
             Message = message,

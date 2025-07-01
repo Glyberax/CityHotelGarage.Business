@@ -20,7 +20,7 @@ public class CityService : ICityService
         _mapper = mapper;
     }
 
-    public async Task<ServiceResult<IEnumerable<CityDto>>> GetAllCitiesAsync()
+    public async Task<Result<IEnumerable<CityDto>>> GetAllCitiesAsync()
     {
         try
         {
@@ -28,15 +28,15 @@ public class CityService : ICityService
                 .ProjectToCityDto(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return ServiceResult<IEnumerable<CityDto>>.Success(cityDtos, "Şehirler başarıyla getirildi.");
+            return Result<IEnumerable<CityDto>>.Success(cityDtos, "Şehirler başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<IEnumerable<CityDto>>.Failure($"Şehirler getirilirken hata oluştu: {ex.Message}");
+            return Result<IEnumerable<CityDto>>.Failure($"Şehirler getirilirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<CityDto>> GetCityByIdAsync(int id)
+    public async Task<Result<CityDto>> GetCityByIdAsync(int id)
     {
         try
         {
@@ -47,18 +47,18 @@ public class CityService : ICityService
 
             if (cityDto == null)
             {
-                return ServiceResult<CityDto>.Failure("Şehir bulunamadı.");
+                return Result<CityDto>.Failure("Şehir bulunamadı.");
             }
 
-            return ServiceResult<CityDto>.Success(cityDto, "Şehir başarıyla getirildi.");
+            return Result<CityDto>.Success(cityDto, "Şehir başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<CityDto>.Failure($"Şehir getirilirken hata oluştu: {ex.Message}");
+            return Result<CityDto>.Failure($"Şehir getirilirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<CityDto>> CreateCityAsync(CityCreateDto cityDto)
+    public async Task<Result<CityDto>> CreateCityAsync(CityCreateDto cityDto)
     {
         try
         {
@@ -72,22 +72,22 @@ public class CityService : ICityService
                 .ProjectToCityDto(_mapper.ConfigurationProvider)
                 .FirstAsync();
 
-            return ServiceResult<CityDto>.Success(resultDto, "Şehir başarıyla oluşturuldu.");
+            return Result<CityDto>.Success(resultDto, "Şehir başarıyla oluşturuldu.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<CityDto>.Failure($"Şehir oluşturulurken hata oluştu: {ex.Message}");
+            return Result<CityDto>.Failure($"Şehir oluşturulurken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<CityDto>> UpdateCityAsync(int id, CityCreateDto cityDto)
+    public async Task<Result<CityDto>> UpdateCityAsync(int id, CityCreateDto cityDto)
     {
         try
         {
             var existingCity = await _cityRepository.GetByIdAsync(id);
             if (existingCity == null)
             {
-                return ServiceResult<CityDto>.Failure("Güncellenecek şehir bulunamadı.");
+                return Result<CityDto>.Failure("Güncellenecek şehir bulunamadı.");
             }
 
             // AutoMapper ile güncelleme
@@ -100,35 +100,35 @@ public class CityService : ICityService
                 .ProjectToCityDto(_mapper.ConfigurationProvider)
                 .FirstAsync();
 
-            return ServiceResult<CityDto>.Success(resultDto, "Şehir başarıyla güncellendi.");
+            return Result<CityDto>.Success(resultDto, "Şehir başarıyla güncellendi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<CityDto>.Failure($"Şehir güncellenirken hata oluştu: {ex.Message}");
+            return Result<CityDto>.Failure($"Şehir güncellenirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult> DeleteCityAsync(int id)
+    public async Task<Result> DeleteCityAsync(int id)
     {
         try
         {
             var exists = await _cityRepository.ExistsAsync(id);
             if (!exists)
             {
-                return ServiceResult.Failure("Silinecek şehir bulunamadı.");
+                return Result.Failure("Silinecek şehir bulunamadı.");
             }
 
             var deleted = await _cityRepository.DeleteAsync(id);
             if (!deleted)
             {
-                return ServiceResult.Failure("Şehir silinirken hata oluştu.");
+                return Result.Failure("Şehir silinirken hata oluştu.");
             }
 
-            return ServiceResult.Success("Şehir başarıyla silindi.");
+            return Result.Success("Şehir başarıyla silindi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult.Failure($"Şehir silinirken hata oluştu: {ex.Message}");
+            return Result.Failure($"Şehir silinirken hata oluştu: {ex.Message}");
         }
     }
 }

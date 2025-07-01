@@ -22,7 +22,7 @@ public class GarageService : IGarageService
         _mapper = mapper;
     }
 
-    public async Task<ServiceResult<IEnumerable<GarageDto>>> GetAllGaragesAsync()
+    public async Task<Result<IEnumerable<GarageDto>>> GetAllGaragesAsync()
     {
         try
         {
@@ -30,15 +30,15 @@ public class GarageService : IGarageService
                 .ProjectToGarageDto(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return ServiceResult<IEnumerable<GarageDto>>.Success(garageDtos, "Garajlar başarıyla getirildi.");
+            return Result<IEnumerable<GarageDto>>.Success(garageDtos, "Garajlar başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<IEnumerable<GarageDto>>.Failure($"Garajlar getirilirken hata oluştu: {ex.Message}");
+            return Result<IEnumerable<GarageDto>>.Failure($"Garajlar getirilirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<GarageDto>> GetGarageByIdAsync(int id)
+    public async Task<Result<GarageDto>> GetGarageByIdAsync(int id)
     {
         try
         {
@@ -49,18 +49,18 @@ public class GarageService : IGarageService
 
             if (garageDto == null)
             {
-                return ServiceResult<GarageDto>.Failure("Garaj bulunamadı.");
+                return Result<GarageDto>.Failure("Garaj bulunamadı.");
             }
 
-            return ServiceResult<GarageDto>.Success(garageDto, "Garaj başarıyla getirildi.");
+            return Result<GarageDto>.Success(garageDto, "Garaj başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<GarageDto>.Failure($"Garaj getirilirken hata oluştu: {ex.Message}");
+            return Result<GarageDto>.Failure($"Garaj getirilirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<IEnumerable<GarageDto>>> GetGaragesByHotelAsync(int hotelId)
+    public async Task<Result<IEnumerable<GarageDto>>> GetGaragesByHotelAsync(int hotelId)
     {
         try
         {
@@ -68,15 +68,15 @@ public class GarageService : IGarageService
                 .ProjectToGarageDto(_mapper.ConfigurationProvider)
                 .ToListAsync();
 
-            return ServiceResult<IEnumerable<GarageDto>>.Success(garageDtos, "Oteldeki garajlar başarıyla getirildi.");
+            return Result<IEnumerable<GarageDto>>.Success(garageDtos, "Oteldeki garajlar başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<IEnumerable<GarageDto>>.Failure($"Oteldeki garajlar getirilirken hata oluştu: {ex.Message}");
+            return Result<IEnumerable<GarageDto>>.Failure($"Oteldeki garajlar getirilirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<GarageDto>> CreateGarageAsync(GarageCreateDto garageDto)
+    public async Task<Result<GarageDto>> CreateGarageAsync(GarageCreateDto garageDto)
     {
         try
         {
@@ -84,7 +84,7 @@ public class GarageService : IGarageService
             var hotelExists = await _hotelRepository.ExistsAsync(garageDto.HotelId);
             if (!hotelExists)
             {
-                return ServiceResult<GarageDto>.Failure("Belirtilen otel bulunamadı.");
+                return Result<GarageDto>.Failure("Belirtilen otel bulunamadı.");
             }
 
             // AutoMapper ile DTO'yu Entity'e çevir
@@ -97,29 +97,29 @@ public class GarageService : IGarageService
                 .ProjectToGarageDto(_mapper.ConfigurationProvider)
                 .FirstAsync();
 
-            return ServiceResult<GarageDto>.Success(resultDto, "Garaj başarıyla oluşturuldu.");
+            return Result<GarageDto>.Success(resultDto, "Garaj başarıyla oluşturuldu.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<GarageDto>.Failure($"Garaj oluşturulurken hata oluştu: {ex.Message}");
+            return Result<GarageDto>.Failure($"Garaj oluşturulurken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<GarageDto>> UpdateGarageAsync(int id, GarageCreateDto garageDto)
+    public async Task<Result<GarageDto>> UpdateGarageAsync(int id, GarageCreateDto garageDto)
     {
         try
         {
             var existingGarage = await _garageRepository.GetByIdAsync(id);
             if (existingGarage == null)
             {
-                return ServiceResult<GarageDto>.Failure("Güncellenecek garaj bulunamadı.");
+                return Result<GarageDto>.Failure("Güncellenecek garaj bulunamadı.");
             }
 
             // Otel var mı kontrol et
             var hotelExists = await _hotelRepository.ExistsAsync(garageDto.HotelId);
             if (!hotelExists)
             {
-                return ServiceResult<GarageDto>.Failure("Belirtilen otel bulunamadı.");
+                return Result<GarageDto>.Failure("Belirtilen otel bulunamadı.");
             }
 
             // AutoMapper ile güncelleme
@@ -132,48 +132,48 @@ public class GarageService : IGarageService
                 .ProjectToGarageDto(_mapper.ConfigurationProvider)
                 .FirstAsync();
 
-            return ServiceResult<GarageDto>.Success(resultDto, "Garaj başarıyla güncellendi.");
+            return Result<GarageDto>.Success(resultDto, "Garaj başarıyla güncellendi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<GarageDto>.Failure($"Garaj güncellenirken hata oluştu: {ex.Message}");
+            return Result<GarageDto>.Failure($"Garaj güncellenirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult> DeleteGarageAsync(int id)
+    public async Task<Result> DeleteGarageAsync(int id)
     {
         try
         {
             var exists = await _garageRepository.ExistsAsync(id);
             if (!exists)
             {
-                return ServiceResult.Failure("Silinecek garaj bulunamadı.");
+                return Result.Failure("Silinecek garaj bulunamadı.");
             }
 
             var deleted = await _garageRepository.DeleteAsync(id);
             if (!deleted)
             {
-                return ServiceResult.Failure("Garaj silinirken hata oluştu.");
+                return Result.Failure("Garaj silinirken hata oluştu.");
             }
 
-            return ServiceResult.Success("Garaj başarıyla silindi.");
+            return Result.Success("Garaj başarıyla silindi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult.Failure($"Garaj silinirken hata oluştu: {ex.Message}");
+            return Result.Failure($"Garaj silinirken hata oluştu: {ex.Message}");
         }
     }
 
-    public async Task<ServiceResult<int>> GetAvailableSpacesAsync(int garageId)
+    public async Task<Result<int>> GetAvailableSpacesAsync(int garageId)
     {
         try
         {
             var availableSpaces = await _garageRepository.GetAvailableSpacesAsync(garageId);
-            return ServiceResult<int>.Success(availableSpaces, "Müsait alan sayısı başarıyla getirildi.");
+            return Result<int>.Success(availableSpaces, "Müsait alan sayısı başarıyla getirildi.");
         }
         catch (Exception ex)
         {
-            return ServiceResult<int>.Failure($"Müsait alan sayısı getirilirken hata oluştu: {ex.Message}");
+            return Result<int>.Failure($"Müsait alan sayısı getirilirken hata oluştu: {ex.Message}");
         }
     }
 }

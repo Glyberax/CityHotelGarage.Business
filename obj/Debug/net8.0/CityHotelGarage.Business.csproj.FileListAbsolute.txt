@@ -12,3 +12,4 @@
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.pdb
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.genruntimeconfig.cache
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/ref/CityHotelGarage.Business.dll
+/Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.sourcelink.json
