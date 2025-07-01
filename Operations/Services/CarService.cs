@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using CityHotelGarage.Business.Operations.DTOs;
 using CityHotelGarage.Business.Operations.Interfaces;
 using CityHotelGarage.Business.Operations.Results;
-using CityHotelGarage.Business.Operations.Validators;
 using CityHotelGarage.Business.Repository.Interfaces;
 using CityHotelGarage.Business.Repository.Models;
 using FluentValidation;
@@ -14,23 +13,26 @@ namespace CityHotelGarage.Business.Operations.Services;
 public class CarService : ICarService
 {
     private readonly ICarRepository _carRepository;
-    private readonly IGarageRepository _garageRepository;
     private readonly IMapper _mapper;
-    private readonly IValidator<CarCreateDto>  _carValidator;
+    private readonly IValidator<CarCreateDto> _carCreateValidator;
+    private readonly IValidator<CarUpdateDto> _carUpdateValidator;
 
-    public CarService(ICarRepository carRepository, IGarageRepository garageRepository, IMapper mapper, IValidator<CarCreateDto> carValidator)
+    public CarService(
+        ICarRepository carRepository, 
+        IMapper mapper, 
+        IValidator<CarCreateDto> carCreateValidator,
+        IValidator<CarUpdateDto> carUpdateValidator)
     {
         _carRepository = carRepository;
-        _garageRepository = garageRepository;
         _mapper = mapper;
-        _carValidator = carValidator;
+        _carCreateValidator = carCreateValidator;
+        _carUpdateValidator = carUpdateValidator;
     }
 
     public async Task<Result<IEnumerable<CarDto>>> GetAllCarsAsync()
     {
         try
         {
-            // AutoMapper projection
             var carDtos = await _carRepository.GetCarsWithDetails()
                 .ProjectTo<CarDto>(_mapper.ConfigurationProvider)
                 .ToListAsync();
@@ -91,18 +93,12 @@ public class CarService : ICarService
     {
         try
         {
-            // Plaka kontrolü
-            var existingCar = await _carRepository.IsLicensePlateExistsAsync(carDto.LicensePlate);
-            if (existingCar)
+            // FluentValidation ile async validation
+            var validationResult = await _carCreateValidator.ValidateAsync(carDto);
+            if (!validationResult.IsValid)
             {
-                return Result<CarDto>.Failure("Bu plaka zaten kayıtlı!");
-            }
-
-            // Garaj kapasitesi kontrolü
-            var availableSpaces = await _garageRepository.GetAvailableSpacesAsync(carDto.GarageId);
-            if (availableSpaces <= 0)
-            {
-                return Result<CarDto>.Failure("Bu garaj dolu! Başka bir garaj seçin.");
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<CarDto>.Failure("Validation hatası", errors);
             }
 
             // AutoMapper ile DTO'yu Entity'e çevir
@@ -123,23 +119,25 @@ public class CarService : ICarService
         }
     }
 
-    public async Task<Result<CarDto>> UpdateCarAsync(int id, CarCreateDto carDto)
+    public async Task<Result<CarDto>> UpdateCarAsync(int id, CarUpdateDto carDto)
     {
         try
         {
+            // CarUpdateDto'da ID set et
+            carDto.Id = id;
+
+            // FluentValidation ile async validation
+            var validationResult = await _carUpdateValidator.ValidateAsync(carDto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<CarDto>.Failure("Validation hatası", errors);
+            }
+
             var existingCar = await _carRepository.GetByIdAsync(id);
             if (existingCar == null)
             {
                 return Result<CarDto>.Failure("Güncellenecek araba bulunamadı.");
-            }
-            
-            _carValidator.ValidateAndThrow(carDto);
-
-            // Plaka kontrolü
-            var existingCarWithPlate = await _carRepository.GetCarByLicensePlateAsync(carDto.LicensePlate);
-            if (existingCarWithPlate != null && existingCarWithPlate.Id != id)
-            {
-                return Result<CarDto>.Failure("Bu plaka başka bir araba tarafından kullanılıyor!");
             }
 
             // AutoMapper ile güncelleme

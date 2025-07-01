@@ -9,4 +9,6 @@ public interface ICarRepository : IBaseRepository<Car>
     Task<Car?> GetCarByLicensePlateAsync(string licensePlate);
     IQueryable<Car> GetCarsByGarage(int garageId);
     Task<bool> IsLicensePlateExistsAsync(string licensePlate);
+    
+    Task<bool> IsLicensePlateUniqueAsync(string licensePlate, int? excludeCarId = null);
 }

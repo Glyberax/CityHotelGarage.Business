@@ -6,20 +6,27 @@ using CityHotelGarage.Business.Operations.Interfaces;
 using CityHotelGarage.Business.Operations.Results;
 using CityHotelGarage.Business.Repository.Interfaces;
 using CityHotelGarage.Business.Repository.Models;
+using FluentValidation;
 
 namespace CityHotelGarage.Business.Operations.Services;
 
 public class HotelService : IHotelService
 {
     private readonly IHotelRepository _hotelRepository;
-    private readonly ICityRepository _cityRepository;
     private readonly IMapper _mapper;
+    private readonly IValidator<HotelCreateDto> _hotelCreateValidator;
+    private readonly IValidator<HotelUpdateDto> _hotelUpdateValidator;
 
-    public HotelService(IHotelRepository hotelRepository, ICityRepository cityRepository, IMapper mapper)
+    public HotelService(
+        IHotelRepository hotelRepository, 
+        IMapper mapper,
+        IValidator<HotelCreateDto> hotelCreateValidator,
+        IValidator<HotelUpdateDto> hotelUpdateValidator)
     {
         _hotelRepository = hotelRepository;
-        _cityRepository = cityRepository;
         _mapper = mapper;
+        _hotelCreateValidator = hotelCreateValidator;
+        _hotelUpdateValidator = hotelUpdateValidator;
     }
 
     public async Task<Result<IEnumerable<HotelDto>>> GetAllHotelsAsync()
@@ -80,11 +87,12 @@ public class HotelService : IHotelService
     {
         try
         {
-            // Şehir var mı kontrol et
-            var cityExists = await _cityRepository.ExistsAsync(hotelDto.CityId);
-            if (!cityExists)
+            // FluentValidation ile async validation
+            var validationResult = await _hotelCreateValidator.ValidateAsync(hotelDto);
+            if (!validationResult.IsValid)
             {
-                return Result<HotelDto>.Failure("Belirtilen şehir bulunamadı.");
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<HotelDto>.Failure("Validation hatası", errors);
             }
 
             // AutoMapper ile DTO'yu Entity'e çevir
@@ -105,21 +113,25 @@ public class HotelService : IHotelService
         }
     }
 
-    public async Task<Result<HotelDto>> UpdateHotelAsync(int id, HotelCreateDto hotelDto)
+    public async Task<Result<HotelDto>> UpdateHotelAsync(int id, HotelUpdateDto hotelDto)
     {
         try
         {
+            // HotelUpdateDto'da ID set et
+            hotelDto.Id = id;
+
+            // FluentValidation ile async validation
+            var validationResult = await _hotelUpdateValidator.ValidateAsync(hotelDto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<HotelDto>.Failure("Validation hatası", errors);
+            }
+
             var existingHotel = await _hotelRepository.GetByIdAsync(id);
             if (existingHotel == null)
             {
                 return Result<HotelDto>.Failure("Güncellenecek otel bulunamadı.");
-            }
-
-            // Şehir var mı kontrol et
-            var cityExists = await _cityRepository.ExistsAsync(hotelDto.CityId);
-            if (!cityExists)
-            {
-                return Result<HotelDto>.Failure("Belirtilen şehir bulunamadı.");
             }
 
             // AutoMapper ile güncelleme
@@ -139,7 +151,6 @@ public class HotelService : IHotelService
             return Result<HotelDto>.Failure($"Otel güncellenirken hata oluştu: {ex.Message}");
         }
     }
-
     public async Task<Result> DeleteHotelAsync(int id)
     {
         try

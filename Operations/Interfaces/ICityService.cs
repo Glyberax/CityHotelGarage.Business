@@ -8,6 +8,6 @@ public interface ICityService
     Task<Result<IEnumerable<CityDto>>> GetAllCitiesAsync();
     Task<Result<CityDto>> GetCityByIdAsync(int id);
     Task<Result<CityDto>> CreateCityAsync(CityCreateDto cityDto);
-    Task<Result<CityDto>> UpdateCityAsync(int id, CityCreateDto cityDto);
+    Task<Result<CityDto>> UpdateCityAsync(int id, CityUpdateDto cityDto); // ← Değişti!
     Task<Result> DeleteCityAsync(int id);
 }

@@ -8,4 +8,8 @@ public interface IGarageRepository : IBaseRepository<Garage>
     Task<Garage?> GetGarageWithDetailsAsync(int id);
     IQueryable<Garage> GetGaragesByHotel(int hotelId);
     Task<int> GetAvailableSpacesAsync(int garageId);
+    
+    // Async validation için yeni metodlar
+    Task<bool> HasAvailableSpaceAsync(int garageId);
+    Task<bool> IsGarageNameUniqueInHotelAsync(string garageName, int hotelId, int? excludeGarageId = null);
 }

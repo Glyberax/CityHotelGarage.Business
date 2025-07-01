@@ -22,4 +22,17 @@ public class CityRepository : BaseRepository<City>, ICityRepository
         return await GetCitiesWithHotels()
             .FirstOrDefaultAsync(c => c.Id == id);
     }
+
+    // Async validation için yeni metod
+    public async Task<bool> IsCityNameUniqueAsync(string cityName, int? excludeCityId = null)
+    {
+        var query = _context.Cities.Where(c => c.Name.ToLower() == cityName.ToLower());
+        
+        if (excludeCityId.HasValue)
+        {
+            query = query.Where(c => c.Id != excludeCityId.Value);
+        }
+        
+        return !await query.AnyAsync();
+    }
 }

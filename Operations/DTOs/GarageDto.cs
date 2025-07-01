@@ -19,3 +19,11 @@ public class GarageCreateDto
     public int Capacity { get; set; }
     public int HotelId { get; set; }
 }
+
+public class GarageUpdateDto
+{
+    public int Id { get; set; } // Update için zorunlu
+    public string Name { get; set; } = "";
+    public int Capacity { get; set; }
+    public int HotelId { get; set; }
+}

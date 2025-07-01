@@ -6,20 +6,27 @@ using CityHotelGarage.Business.Operations.Interfaces;
 using CityHotelGarage.Business.Operations.Results;
 using CityHotelGarage.Business.Repository.Interfaces;
 using CityHotelGarage.Business.Repository.Models;
+using FluentValidation;
 
 namespace CityHotelGarage.Business.Operations.Services;
 
 public class GarageService : IGarageService
 {
     private readonly IGarageRepository _garageRepository;
-    private readonly IHotelRepository _hotelRepository;
     private readonly IMapper _mapper;
+    private readonly IValidator<GarageCreateDto> _garageCreateValidator;
+    private readonly IValidator<GarageUpdateDto> _garageUpdateValidator;
 
-    public GarageService(IGarageRepository garageRepository, IHotelRepository hotelRepository, IMapper mapper)
+    public GarageService(
+        IGarageRepository garageRepository, 
+        IMapper mapper,
+        IValidator<GarageCreateDto> garageCreateValidator,
+        IValidator<GarageUpdateDto> garageUpdateValidator)
     {
         _garageRepository = garageRepository;
-        _hotelRepository = hotelRepository;
         _mapper = mapper;
+        _garageCreateValidator = garageCreateValidator;
+        _garageUpdateValidator = garageUpdateValidator;
     }
 
     public async Task<Result<IEnumerable<GarageDto>>> GetAllGaragesAsync()
@@ -80,11 +87,12 @@ public class GarageService : IGarageService
     {
         try
         {
-            // Otel var mı kontrol et
-            var hotelExists = await _hotelRepository.ExistsAsync(garageDto.HotelId);
-            if (!hotelExists)
+            // FluentValidation ile async validation
+            var validationResult = await _garageCreateValidator.ValidateAsync(garageDto);
+            if (!validationResult.IsValid)
             {
-                return Result<GarageDto>.Failure("Belirtilen otel bulunamadı.");
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<GarageDto>.Failure("Validation hatası", errors);
             }
 
             // AutoMapper ile DTO'yu Entity'e çevir
@@ -105,21 +113,25 @@ public class GarageService : IGarageService
         }
     }
 
-    public async Task<Result<GarageDto>> UpdateGarageAsync(int id, GarageCreateDto garageDto)
+    public async Task<Result<GarageDto>> UpdateGarageAsync(int id, GarageUpdateDto garageDto)
     {
         try
         {
+            // GarageUpdateDto'da ID set et
+            garageDto.Id = id;
+
+            // FluentValidation ile async validation
+            var validationResult = await _garageUpdateValidator.ValidateAsync(garageDto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<GarageDto>.Failure("Validation hatası", errors);
+            }
+
             var existingGarage = await _garageRepository.GetByIdAsync(id);
             if (existingGarage == null)
             {
                 return Result<GarageDto>.Failure("Güncellenecek garaj bulunamadı.");
-            }
-
-            // Otel var mı kontrol et
-            var hotelExists = await _hotelRepository.ExistsAsync(garageDto.HotelId);
-            if (!hotelExists)
-            {
-                return Result<GarageDto>.Failure("Belirtilen otel bulunamadı.");
             }
 
             // AutoMapper ile güncelleme

@@ -6,4 +6,7 @@ public interface ICityRepository : IBaseRepository<City>
 {
     IQueryable<City> GetCitiesWithHotels();
     Task<City?> GetCityWithHotelsAsync(int id);
+    
+    // Async validation için yeni metodlar
+    Task<bool> IsCityNameUniqueAsync(string cityName, int? excludeCityId = null);
 }

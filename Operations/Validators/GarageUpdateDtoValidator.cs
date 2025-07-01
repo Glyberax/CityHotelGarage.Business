@@ -4,15 +4,22 @@ using CityHotelGarage.Business.Repository.Interfaces;
 
 namespace CityHotelGarage.Business.Operations.Validators;
 
-public class GarageCreateDtoValidator : AbstractValidator<GarageCreateDto>
+public class GarageUpdateDtoValidator : AbstractValidator<GarageUpdateDto>
 {
     private readonly IHotelRepository _hotelRepository;
     private readonly IGarageRepository _garageRepository;
 
-    public GarageCreateDtoValidator(IHotelRepository hotelRepository, IGarageRepository garageRepository)
+    public GarageUpdateDtoValidator(IHotelRepository hotelRepository, IGarageRepository garageRepository)
     {
         _hotelRepository = hotelRepository;
         _garageRepository = garageRepository;
+
+        RuleFor(x => x.Id)
+            .GreaterThan(0).WithMessage("Geçerli bir garaj ID'si gereklidir")
+            .MustAsync(async (id, cancellation) =>
+            {
+                return await _garageRepository.ExistsAsync(id);
+            }).WithMessage("Güncellenecek garaj bulunamadı");
 
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Garaj adı zorunludur")
@@ -30,11 +37,11 @@ public class GarageCreateDtoValidator : AbstractValidator<GarageCreateDto>
                 return await _hotelRepository.ExistsAsync(hotelId);
             }).WithMessage("Belirtilen otel bulunamadı");
 
-        // Aynı otelde aynı isimde garaj olmamalı
+        // Aynı otelde aynı isimde garaj olmamalı (kendi ID'si hariç)
         RuleFor(x => x)
             .MustAsync(async (dto, cancellation) =>
             {
-                return await _garageRepository.IsGarageNameUniqueInHotelAsync(dto.Name, dto.HotelId);
-            }).WithMessage("Bu otelde aynı isimde bir garaj zaten mevcut!");
+                return await _garageRepository.IsGarageNameUniqueInHotelAsync(dto.Name, dto.HotelId, dto.Id);
+            }).WithMessage("Bu otelde aynı isimde başka bir garaj zaten mevcut!");
     }
 }

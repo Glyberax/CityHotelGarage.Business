@@ -6,6 +6,7 @@ using CityHotelGarage.Business.Operations.Interfaces;
 using CityHotelGarage.Business.Operations.Results;
 using CityHotelGarage.Business.Repository.Interfaces;
 using CityHotelGarage.Business.Repository.Models;
+using FluentValidation;
 
 namespace CityHotelGarage.Business.Operations.Services;
 
@@ -13,11 +14,19 @@ public class CityService : ICityService
 {
     private readonly ICityRepository _cityRepository;
     private readonly IMapper _mapper;
+    private readonly IValidator<CityCreateDto> _cityCreateValidator;
+    private readonly IValidator<CityUpdateDto> _cityUpdateValidator;
 
-    public CityService(ICityRepository cityRepository, IMapper mapper)
+    public CityService(
+        ICityRepository cityRepository, 
+        IMapper mapper,
+        IValidator<CityCreateDto> cityCreateValidator,
+        IValidator<CityUpdateDto> cityUpdateValidator)
     {
         _cityRepository = cityRepository;
         _mapper = mapper;
+        _cityCreateValidator = cityCreateValidator;
+        _cityUpdateValidator = cityUpdateValidator;
     }
 
     public async Task<Result<IEnumerable<CityDto>>> GetAllCitiesAsync()
@@ -62,6 +71,14 @@ public class CityService : ICityService
     {
         try
         {
+            // FluentValidation ile async validation
+            var validationResult = await _cityCreateValidator.ValidateAsync(cityDto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<CityDto>.Failure("Validation hatası", errors);
+            }
+
             // AutoMapper ile DTO'yu Entity'e çevir
             var city = _mapper.Map<City>(cityDto);
             var createdCity = await _cityRepository.AddAsync(city);
@@ -80,10 +97,21 @@ public class CityService : ICityService
         }
     }
 
-    public async Task<Result<CityDto>> UpdateCityAsync(int id, CityCreateDto cityDto)
+    public async Task<Result<CityDto>> UpdateCityAsync(int id, CityUpdateDto cityDto)
     {
         try
         {
+            // CityUpdateDto'da ID set et
+            cityDto.Id = id;
+
+            // FluentValidation ile async validation
+            var validationResult = await _cityUpdateValidator.ValidateAsync(cityDto);
+            if (!validationResult.IsValid)
+            {
+                var errors = validationResult.Errors.Select(e => e.ErrorMessage).ToList();
+                return Result<CityDto>.Failure("Validation hatası", errors);
+            }
+
             var existingCity = await _cityRepository.GetByIdAsync(id);
             if (existingCity == null)
             {

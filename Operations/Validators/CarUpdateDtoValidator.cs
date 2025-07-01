@@ -4,15 +4,22 @@ using CityHotelGarage.Business.Repository.Interfaces;
 
 namespace CityHotelGarage.Business.Operations.Validators;
 
-public class CarCreateDtoValidator : AbstractValidator<CarCreateDto>
+public class CarUpdateDtoValidator : AbstractValidator<CarUpdateDto>
 {
     private readonly ICarRepository _carRepository;
     private readonly IGarageRepository _garageRepository;
 
-    public CarCreateDtoValidator(ICarRepository carRepository, IGarageRepository garageRepository)
+    public CarUpdateDtoValidator(ICarRepository carRepository, IGarageRepository garageRepository)
     {
         _carRepository = carRepository;
         _garageRepository = garageRepository;
+
+        RuleFor(x => x.Id)
+            .GreaterThan(0).WithMessage("Geçerli bir araç ID'si gereklidir")
+            .MustAsync(async (id, cancellation) =>
+            {
+                return await _carRepository.ExistsAsync(id);
+            }).WithMessage("Güncellenecek araç bulunamadı");
 
         RuleFor(x => x.Brand)
             .NotEmpty().WithMessage("Marka alanı zorunludur")
@@ -23,11 +30,11 @@ public class CarCreateDtoValidator : AbstractValidator<CarCreateDto>
             .NotEmpty().WithMessage("Plaka alanı zorunludur")
             .Matches(@"^[0-9]{2}[A-ZÇĞIİÖŞÜ]{1,3}[0-9]{2,4}$")
             .WithMessage("Geçerli bir Türk plakası formatı giriniz (örn: 34ABC123)")
-            .MustAsync(async (licensePlate, cancellation) =>
+            .MustAsync(async (dto, licensePlate, cancellation) =>
             {
-                // Create işlemi için - plaka hiç kullanılmamalı
-                return await _carRepository.IsLicensePlateUniqueAsync(licensePlate);
-            }).WithMessage("Bu plaka zaten kayıtlı!");
+                // Update işlemi için - kendi ID'si hariç plaka unique olmalı
+                return await _carRepository.IsLicensePlateUniqueAsync(licensePlate, dto.Id);
+            }).WithMessage("Bu plaka başka bir araba tarafından kullanılıyor!");
 
         RuleFor(x => x.OwnerName)
             .NotEmpty().WithMessage("Araç sahibi adı zorunludur")
@@ -39,10 +46,6 @@ public class CarCreateDtoValidator : AbstractValidator<CarCreateDto>
             .MustAsync(async (garageId, cancellation) =>
             {
                 return await _garageRepository.ExistsAsync(garageId);
-            }).WithMessage("Belirtilen garaj bulunamadı")
-            .MustAsync(async (garageId, cancellation) =>
-            {
-                return await _garageRepository.HasAvailableSpaceAsync(garageId);
-            }).WithMessage("Bu garaj dolu! Başka bir garaj seçin.");
+            }).WithMessage("Belirtilen garaj bulunamadı");
     }
 }

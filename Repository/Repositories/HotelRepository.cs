@@ -29,4 +29,19 @@ public class HotelRepository : BaseRepository<Hotel>, IHotelRepository
         return GetHotelsWithDetails()
             .Where(h => h.CityId == cityId);
     }
+
+    // Async validation için yeni metod
+    public async Task<bool> IsHotelNameUniqueInCityAsync(string hotelName, int cityId, int? excludeHotelId = null)
+    {
+        var query = _context.Hotels.Where(h => 
+            h.Name.ToLower() == hotelName.ToLower() && 
+            h.CityId == cityId);
+        
+        if (excludeHotelId.HasValue)
+        {
+            query = query.Where(h => h.Id != excludeHotelId.Value);
+        }
+        
+        return !await query.AnyAsync();
+    }
 }

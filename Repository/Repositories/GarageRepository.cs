@@ -41,4 +41,25 @@ public class GarageRepository : BaseRepository<Garage>, IGarageRepository
         
         return garage.Capacity - garage.Cars.Count;
     }
+
+    // Async validation için yeni metodlar
+    public async Task<bool> HasAvailableSpaceAsync(int garageId)
+    {
+        var availableSpaces = await GetAvailableSpacesAsync(garageId);
+        return availableSpaces > 0;
+    }
+
+    public async Task<bool> IsGarageNameUniqueInHotelAsync(string garageName, int hotelId, int? excludeGarageId = null)
+    {
+        var query = _context.Garages.Where(g => 
+            g.Name.ToLower() == garageName.ToLower() && 
+            g.HotelId == hotelId);
+        
+        if (excludeGarageId.HasValue)
+        {
+            query = query.Where(g => g.Id != excludeGarageId.Value);
+        }
+        
+        return !await query.AnyAsync();
+    }
 }

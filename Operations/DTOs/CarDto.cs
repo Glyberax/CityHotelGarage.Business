@@ -20,3 +20,12 @@ public class CarCreateDto
     public string OwnerName { get; set; } = "";
     public int GarageId { get; set; }
 }
+
+public class CarUpdateDto
+{
+    public int Id { get; set; } // Update için zorunlu
+    public string Brand { get; set; } = "";
+    public string LicensePlate { get; set; } = "";
+    public string OwnerName { get; set; } = "";
+    public int GarageId { get; set; }
+}

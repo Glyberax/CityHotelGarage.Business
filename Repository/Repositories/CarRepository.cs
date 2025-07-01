@@ -42,4 +42,17 @@ public class CarRepository : BaseRepository<Models.Car>, ICarRepository
         return await _context.Cars
             .AnyAsync(c => c.LicensePlate == licensePlate);
     }
+
+    // Async validation için yeni metod
+    public async Task<bool> IsLicensePlateUniqueAsync(string licensePlate, int? excludeCarId = null)
+    {
+        var query = _context.Cars.Where(c => c.LicensePlate == licensePlate);
+        
+        if (excludeCarId.HasValue)
+        {
+            query = query.Where(c => c.Id != excludeCarId.Value);
+        }
+        
+        return !await query.AnyAsync();
+    }
 }

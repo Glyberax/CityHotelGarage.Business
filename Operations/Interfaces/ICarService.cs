@@ -9,6 +9,6 @@ public interface ICarService
     Task<Result<CarDto>> GetCarByIdAsync(int id);
     Task<Result<CarDto>> GetCarByLicensePlateAsync(string licensePlate);
     Task<Result<CarDto>> ParkCarAsync(CarCreateDto carDto);
-    Task<Result<CarDto>> UpdateCarAsync(int id, CarCreateDto carDto);
-    Task<Result> RemoveCarAsync(int id);
+    Task<Result<CarDto>> UpdateCarAsync(int id, CarUpdateDto carDto); // ← Değişti!
+    Task<Result> RemoveCarAsync(int id); // ← Task<Result> olacak
 }

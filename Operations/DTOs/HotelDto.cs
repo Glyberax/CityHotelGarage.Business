@@ -17,3 +17,11 @@ public class HotelCreateDto
     public int Yildiz { get; set; }
     public int CityId { get; set; }
 }
+
+public class HotelUpdateDto
+{
+    public int Id { get; set; } // Update için zorunlu
+    public string Name { get; set; } = "";
+    public int Yildiz { get; set; }
+    public int CityId { get; set; }
+}
