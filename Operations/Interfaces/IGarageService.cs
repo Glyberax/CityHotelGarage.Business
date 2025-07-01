@@ -9,7 +9,7 @@ public interface IGarageService
     Task<Result<GarageDto>> GetGarageByIdAsync(int id);
     Task<Result<IEnumerable<GarageDto>>> GetGaragesByHotelAsync(int hotelId);
     Task<Result<GarageDto>> CreateGarageAsync(GarageCreateDto garageDto);
-    Task<Result<GarageDto>> UpdateGarageAsync(int id, GarageUpdateDto garageDto); // ← Değişti!
+    Task<Result<GarageDto>> UpdateGarageAsync(int id, GarageUpdateDto garageDto);
     Task<Result> DeleteGarageAsync(int id);
     Task<Result<int>> GetAvailableSpacesAsync(int garageId);
 }

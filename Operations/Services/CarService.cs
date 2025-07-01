@@ -89,7 +89,26 @@ public class CarService : ICarService
         }
     }
 
-    public async Task<Result<CarDto>> ParkCarAsync(CarCreateDto carDto)
+    // ✅ YENİ: GetCarsByGarageAsync implementasyonu
+    public async Task<Result<IEnumerable<CarDto>>> GetCarsByGarageAsync(int garageId)
+    {
+        try
+        {
+            var carDtos = await _carRepository.GetCarsWithDetails()
+                .Where(c => c.GarageId == garageId)
+                .ProjectTo<CarDto>(_mapper.ConfigurationProvider)
+                .ToListAsync();
+
+            return Result<IEnumerable<CarDto>>.Success(carDtos, "Garajdaki arabalar başarıyla getirildi.");
+        }
+        catch (Exception ex)
+        {
+            return Result<IEnumerable<CarDto>>.Failure($"Garajdaki arabalar getirilirken hata oluştu: {ex.Message}");
+        }
+    }
+
+    // ✅ RENAMED: ParkCarAsync → CreateCarAsync
+    public async Task<Result<CarDto>> CreateCarAsync(CarCreateDto carDto)
     {
         try
         {
@@ -104,8 +123,8 @@ public class CarService : ICarService
             // AutoMapper ile DTO'yu Entity'e çevir
             var car = _mapper.Map<Car>(carDto);
             var createdCar = await _carRepository.AddAsync(car);
-            
-            // AutoMapper projection
+
+            // AutoMapper projection ile bilgiyi al
             var resultDto = await _carRepository.GetCarsWithDetails()
                 .Where(c => c.Id == createdCar.Id)
                 .ProjectTo<CarDto>(_mapper.ConfigurationProvider)
@@ -158,7 +177,8 @@ public class CarService : ICarService
         }
     }
 
-    public async Task<Result> RemoveCarAsync(int id)
+    // ✅ RENAMED: RemoveCarAsync → DeleteCarAsync  
+    public async Task<Result> DeleteCarAsync(int id)
     {
         try
         {
@@ -180,5 +200,16 @@ public class CarService : ICarService
         {
             return Result.Failure($"Araba çıkarılırken hata oluştu: {ex.Message}");
         }
+    }
+
+    // 🔄 LEGACY METHODS - Controller uyumluluğu için (geriye dönük uyumluluk)
+    public async Task<Result<CarDto>> ParkCarAsync(CarCreateDto carDto)
+    {
+        return await CreateCarAsync(carDto);
+    }
+
+    public async Task<Result> RemoveCarAsync(int id)
+    {
+        return await DeleteCarAsync(id);
     }
 }

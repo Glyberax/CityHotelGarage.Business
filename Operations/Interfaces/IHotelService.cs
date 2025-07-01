@@ -9,6 +9,6 @@ public interface IHotelService
     Task<Result<HotelDto>> GetHotelByIdAsync(int id);
     Task<Result<IEnumerable<HotelDto>>> GetHotelsByCityAsync(int cityId);
     Task<Result<HotelDto>> CreateHotelAsync(HotelCreateDto hotelDto);
-    Task<Result<HotelDto>> UpdateHotelAsync(int id, HotelUpdateDto hotelDto); // ← Değişti!
+    Task<Result<HotelDto>> UpdateHotelAsync(int id, HotelUpdateDto hotelDto);
     Task<Result> DeleteHotelAsync(int id);
 }
