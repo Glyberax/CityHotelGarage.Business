@@ -30,7 +30,7 @@ public class HotelRepository : BaseRepository<Hotel>, IHotelRepository
             .Where(h => h.CityId == cityId);
     }
 
-    // Async validation için yeni metod
+    // Async
     public async Task<bool> IsHotelNameUniqueInCityAsync(string hotelName, int cityId, int? excludeHotelId = null)
     {
         var query = _context.Hotels.Where(h => 

@@ -32,7 +32,7 @@ public class CarUpdateDtoValidator : AbstractValidator<CarUpdateDto>
             .WithMessage("Geçerli bir Türk plakası formatı giriniz (örn: 34ABC123)")
             .MustAsync(async (dto, licensePlate, cancellation) =>
             {
-                // Update işlemi için - kendi ID'si hariç plaka unique olmalı
+                // Update işlemi için - kendi ID'si hariç
                 return await _carRepository.IsLicensePlateUniqueAsync(licensePlate, dto.Id);
             }).WithMessage("Bu plaka başka bir araba tarafından kullanılıyor!");
 

@@ -42,7 +42,7 @@ public class GarageRepository : BaseRepository<Garage>, IGarageRepository
         return garage.Capacity - garage.Cars.Count;
     }
 
-    // Async validation için yeni metodlar
+    // Async
     public async Task<bool> HasAvailableSpaceAsync(int garageId)
     {
         var availableSpaces = await GetAvailableSpacesAsync(garageId);

@@ -18,7 +18,6 @@ public class CityCreateDtoValidator : AbstractValidator<CityCreateDto>
             .Matches("^[a-zA-ZğüşıöçĞÜŞİÖÇ ]+$").WithMessage("Şehir adı sadece harf ve boşluk içerebilir")
             .MustAsync(async (cityName, cancellation) =>
             {
-                // Create işlemi için - şehir adı unique olmalı
                 return await _cityRepository.IsCityNameUniqueAsync(cityName);
             }).WithMessage("Bu şehir adı zaten kayıtlı!");
 

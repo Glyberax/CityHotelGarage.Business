@@ -29,3 +29,8 @@ public class CarUpdateDto
     public string OwnerName { get; set; } = "";
     public int GarageId { get; set; }
 }
+
+public class CarDeleteDto
+{
+    public int Id { get; set; }
+}

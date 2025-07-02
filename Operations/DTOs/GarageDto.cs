@@ -27,3 +27,7 @@ public class GarageUpdateDto
     public int Capacity { get; set; }
     public int HotelId { get; set; }
 }
+public class GarageDeleteDto
+{
+    public int Id { get; set; }
+}

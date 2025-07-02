@@ -101,7 +101,7 @@ public class CityService : ICityService
     {
         try
         {
-            // CityUpdateDto'da ID set et
+            //ID set et
             cityDto.Id = id;
 
             // FluentValidation ile async validation

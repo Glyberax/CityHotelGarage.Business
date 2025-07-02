@@ -89,7 +89,6 @@ public class CarService : ICarService
         }
     }
 
-    // ✅ YENİ: GetCarsByGarageAsync implementasyonu
     public async Task<Result<IEnumerable<CarDto>>> GetCarsByGarageAsync(int garageId)
     {
         try
@@ -107,7 +106,6 @@ public class CarService : ICarService
         }
     }
 
-    // ✅ RENAMED: ParkCarAsync → CreateCarAsync
     public async Task<Result<CarDto>> CreateCarAsync(CarCreateDto carDto)
     {
         try
@@ -177,7 +175,6 @@ public class CarService : ICarService
         }
     }
 
-    // ✅ RENAMED: RemoveCarAsync → DeleteCarAsync  
     public async Task<Result> DeleteCarAsync(int id)
     {
         try
@@ -202,7 +199,6 @@ public class CarService : ICarService
         }
     }
 
-    // 🔄 LEGACY METHODS - Controller uyumluluğu için (geriye dönük uyumluluk)
     public async Task<Result<CarDto>> ParkCarAsync(CarCreateDto carDto)
     {
         return await CreateCarAsync(carDto);

@@ -25,3 +25,8 @@ public class HotelUpdateDto
     public int Yildiz { get; set; }
     public int CityId { get; set; }
 }
+
+public class HotelDeleteDto
+{
+    public int Id { get; set; }
+}

@@ -23,7 +23,7 @@ public class CityRepository : BaseRepository<City>, ICityRepository
             .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    // Async validation için yeni metod
+    // Async
     public async Task<bool> IsCityNameUniqueAsync(string cityName, int? excludeCityId = null)
     {
         var query = _context.Cities.Where(c => c.Name.ToLower() == cityName.ToLower());

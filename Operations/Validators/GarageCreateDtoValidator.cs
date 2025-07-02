@@ -30,7 +30,6 @@ public class GarageCreateDtoValidator : AbstractValidator<GarageCreateDto>
                 return await _hotelRepository.ExistsAsync(hotelId);
             }).WithMessage("Belirtilen otel bulunamadı");
 
-        // Aynı otelde aynı isimde garaj olmamalı
         RuleFor(x => x)
             .MustAsync(async (dto, cancellation) =>
             {
