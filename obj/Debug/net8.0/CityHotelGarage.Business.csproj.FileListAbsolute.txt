@@ -7,9 +7,9 @@
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.AssemblyInfoInputs.cache
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.AssemblyInfo.cs
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.csproj.CoreCompileInputs.cache
+/Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.sourcelink.json
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.dll
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/refint/CityHotelGarage.Business.dll
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.pdb
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.genruntimeconfig.cache
 /Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/ref/CityHotelGarage.Business.dll
-/Users/ardacaliskan/RiderProjects/CityHotelGarageAPI/CityHotelGarage.Business/obj/Debug/net8.0/CityHotelGarage.Business.sourcelink.json

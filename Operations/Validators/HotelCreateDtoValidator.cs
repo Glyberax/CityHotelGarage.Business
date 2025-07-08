@@ -36,4 +36,4 @@ public class HotelCreateDtoValidator : AbstractValidator<HotelCreateDto>
                 return await _hotelRepository.IsHotelNameUniqueInCityAsync(dto.Name, dto.CityId);
             }).WithMessage("Bu şehirde aynı isimde bir otel zaten mevcut!");
     }
-}w
+}
