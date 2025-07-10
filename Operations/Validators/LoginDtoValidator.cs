@@ -1,4 +1,3 @@
-// Operations/Validators/LoginDtoValidator.cs
 using FluentValidation;
 using CityHotelGarage.Business.Operations.DTOs;
 

@@ -14,7 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Hotel> Hotels { get; set; }
     public DbSet<Garage> Garages { get; set; }
     public DbSet<Car> Cars { get; set; }
-    public DbSet<User> Users { get; set; } // ✅ YENİ - JWT Authentication için
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

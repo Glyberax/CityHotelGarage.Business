@@ -29,7 +29,7 @@ public class JwtService : IJwtService
     public JwtService(IConfiguration configuration)
     {
         _configuration = configuration;
-        _secretKey = _configuration["JWT:SecretKey"] ?? "CityHotelGarageSecretKey2024!@#VerySecureKey123456789";
+        _secretKey = _configuration["JWT:SecretKey"] ?? "CityHotelGarageSecretKey2024!@#VerySecureKey123456781";
         _issuer = _configuration["JWT:Issuer"] ?? "CityHotelGarageAPI";
         _audience = _configuration["JWT:Audience"] ?? "CityHotelGarageUsers";
         _accessTokenExpirationMinutes = double.Parse(_configuration["JWT:AccessTokenExpirationMinutes"] ?? "10080"); // 7 gün

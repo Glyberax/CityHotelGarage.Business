@@ -8,7 +8,6 @@ public class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {
-        // ✅ YENİ: User Authentication Mappings
         CreateMap<User, UserDto>()
             .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))

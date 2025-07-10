@@ -1,4 +1,3 @@
-// Repository/Interfaces/IUserRepository.cs
 using CityHotelGarage.Business.Repository.Models;
 
 namespace CityHotelGarage.Business.Repository.Interfaces;

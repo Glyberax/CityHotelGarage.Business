@@ -1,4 +1,3 @@
-// Repository/Models/User.cs
 using System.ComponentModel.DataAnnotations;
 
 namespace CityHotelGarage.Business.Repository.Models;
