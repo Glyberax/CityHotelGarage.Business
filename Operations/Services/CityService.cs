@@ -194,7 +194,106 @@ public class CityService : ICityService
 
     private void InvalidateCityCaches()
     {
+        // Eski cache'leri temizle
         _cacheService.Remove(ALL_CITIES_KEY);
-        _logger.LogInformation("🧹 City cache'leri temizlendi");
+    
+        // Sayfalı cache'leri temizle (pattern ile)
+        _cacheService.RemoveByPattern("cities:paged");
+    
+        _logger.LogInformation("🧹 City cache'leri temizlendi (normal + paged)");
     }
+    
+
+/// <summary>
+/// Sayfalı şehir listesi getirir - Arama, sıralama ve cache destekli
+/// </summary>
+public async Task<Result<PagedResult<CityDto>>> GetPagedCitiesAsync(PagingRequestDto pagingRequest)
+{
+    try
+    {
+        // Input validation ve default değerler
+        if (pagingRequest.PageNumber <= 0) pagingRequest.PageNumber = 1;
+        if (pagingRequest.PageSize <= 0 || pagingRequest.PageSize > PagingRequestDto.MaxPageSize)
+            pagingRequest.PageSize = 10;
+
+        // Cache key oluştur (tüm parametreleri içeren benzersiz key)
+        string cacheKey = $"cities:paged:{pagingRequest.PageNumber}:{pagingRequest.PageSize}:" +
+                         $"{pagingRequest.SearchTerm ?? "null"}:{pagingRequest.SortBy ?? "name"}:" +
+                         $"{pagingRequest.SortDescending}";
+
+        // 1️⃣ Cache kontrolü
+        var cachedResult = _cacheService.Get<PagedResult<CityDto>>(cacheKey);
+        if (cachedResult != null)
+        {
+            _logger.LogInformation("✅ Paged cities cache HIT: {CacheKey}", cacheKey);
+            return Result<PagedResult<CityDto>>.Success(cachedResult, "Sayfalı şehirler cache'den getirildi.");
+        }
+
+        _logger.LogInformation("❌ Paged cities cache MISS: {CacheKey}", cacheKey);
+
+        // 2️⃣ Base query oluştur (Include ile)
+        var query = _cityRepository.GetCitiesWithHotels();
+
+        // 3️⃣ Search filtresi uygula (Service layer'da)
+        if (!string.IsNullOrWhiteSpace(pagingRequest.SearchTerm))
+        {
+            var searchTerm = pagingRequest.SearchTerm.Trim().ToLower();
+            query = query.Where(c => c.Name.ToLower().Contains(searchTerm));
+            
+            _logger.LogInformation("🔍 Search applied: {SearchTerm}", searchTerm);
+        }
+
+        // 4️⃣ Sorting uygula (Service layer'da)
+        query = pagingRequest.SortBy?.ToLower() switch
+        {
+            "population" => pagingRequest.SortDescending 
+                ? query.OrderByDescending(c => c.Population)
+                : query.OrderBy(c => c.Population),
+            "createddate" => pagingRequest.SortDescending
+                ? query.OrderByDescending(c => c.CreatedDate)
+                : query.OrderBy(c => c.CreatedDate),
+            _ => pagingRequest.SortDescending  // Default: name
+                ? query.OrderByDescending(c => c.Name)
+                : query.OrderBy(c => c.Name)
+        };
+
+        _logger.LogInformation("📊 Sorting applied: {SortBy} {Direction}", 
+            pagingRequest.SortBy ?? "name", 
+            pagingRequest.SortDescending ? "DESC" : "ASC");
+
+        // 5️⃣ Repository'den sayfalı veri al
+        var (cities, totalCount) = await _cityRepository.GetPagedAsync(
+            query, 
+            pagingRequest.PageNumber, 
+            pagingRequest.PageSize
+        );
+
+        // 6️⃣ DTO'ya çevir
+        var cityDtos = _mapper.Map<List<CityDto>>(cities);
+
+        // 7️⃣ PagedResult oluştur
+        var pagedResult = new PagedResult<CityDto>(
+            cityDtos,
+            pagingRequest.PageNumber,
+            pagingRequest.PageSize,
+            totalCount,
+            $"Sayfa {pagingRequest.PageNumber} - {cityDtos.Count} şehir getirildi."
+        );
+
+        // 8️⃣ Cache'e kaydet (30 dakika - daha kısa süre çünkü dinamik)
+        _cacheService.Set(cacheKey, pagedResult, TimeSpan.FromMinutes(30));
+
+        _logger.LogInformation("📦 Paged cities cached: {TotalRecords} total, {CurrentPage}/{TotalPages} pages",
+            totalCount, pagingRequest.PageNumber, pagedResult.Pagination.TotalPages);
+
+        return Result<PagedResult<CityDto>>.Success(pagedResult, pagedResult.Message);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "GetPagedCitiesAsync error - Page: {PageNumber}, Size: {PageSize}, Search: {SearchTerm}", 
+            pagingRequest.PageNumber, pagingRequest.PageSize, pagingRequest.SearchTerm);
+        
+        return Result<PagedResult<CityDto>>.Failure($"Sayfalı şehirler getirilirken hata oluştu: {ex.Message}");
+    }
+}
 }
