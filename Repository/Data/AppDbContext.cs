@@ -1,3 +1,4 @@
+// Repository/Data/AppDbContext.cs (UPDATED)
 using Microsoft.EntityFrameworkCore;
 using CityHotelGarage.Business.Repository.Models;
 
@@ -13,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Hotel> Hotels { get; set; }
     public DbSet<Garage> Garages { get; set; }
     public DbSet<Car> Cars { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -40,5 +42,27 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Car>()
             .HasIndex(c => c.LicensePlate)
             .IsUnique();
+
+        // ✅ YENİ - User Entity Configuration
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Username)
+            .IsUnique();
+            
+        modelBuilder.Entity<User>()
+            .HasIndex(u => u.Email)
+            .IsUnique();
+
+        // User default değerler
+        modelBuilder.Entity<User>()
+            .Property(u => u.Role)
+            .HasDefaultValue("User");
+            
+        modelBuilder.Entity<User>()
+            .Property(u => u.IsActive)
+            .HasDefaultValue(true);
+            
+        modelBuilder.Entity<User>()
+            .Property(u => u.CreatedDate)
+            .HasDefaultValueSql("CURRENT_TIMESTAMP");
     }
 }

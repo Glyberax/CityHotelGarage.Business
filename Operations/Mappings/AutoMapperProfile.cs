@@ -8,6 +8,31 @@ public class AutoMapperProfile : Profile
 {
     public AutoMapperProfile()
     {
+        CreateMap<User, UserDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => src.IsActive))
+            .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate))
+            .ForMember(dest => dest.LastLoginDate, opt => opt.MapFrom(src => src.LastLoginDate));
+
+        CreateMap<RegisterDto, User>()
+            .ForMember(dest => dest.Id, opt => opt.Ignore())
+            .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.Username))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+            .ForMember(dest => dest.FirstName, opt => opt.MapFrom(src => src.FirstName))
+            .ForMember(dest => dest.LastName, opt => opt.MapFrom(src => src.LastName))
+            .ForMember(dest => dest.Role, opt => opt.MapFrom(src => src.Role))
+            .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
+            .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
+            .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
+            .ForMember(dest => dest.LastLoginDate, opt => opt.Ignore())
+            .ForMember(dest => dest.RefreshToken, opt => opt.Ignore())
+            .ForMember(dest => dest.RefreshTokenExpiryTime, opt => opt.Ignore());
+
         // City → CityDto (Read)
         CreateMap<City, CityDto>()
             .ForMember(dest => dest.HotelCount, opt => opt.MapFrom(src => src.Hotels.Count));
@@ -18,10 +43,10 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => DateTime.UtcNow))
             .ForMember(dest => dest.Hotels, opt => opt.Ignore());
 
-        // ✅ YENİ: CityUpdateDto → City (Update)
+        // CityUpdateDto → City (Update)
         CreateMap<CityUpdateDto, City>()
-            .ForMember(dest => dest.CreatedDate, opt => opt.Ignore()) // CreatedDate değişmesin
-            .ForMember(dest => dest.Hotels, opt => opt.Ignore()); // Navigation property ignore
+            .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+            .ForMember(dest => dest.Hotels, opt => opt.Ignore());
         
         // Hotel → HotelDto (Read)
         CreateMap<Hotel, HotelDto>()
@@ -71,8 +96,8 @@ public class AutoMapperProfile : Profile
             .ForMember(dest => dest.Garage, opt => opt.Ignore());
 
         CreateMap<CarUpdateDto, Car>()
-            .ForMember(dest => dest.EntryTime, opt => opt.Ignore()) // EntryTime değişmesin
-            .ForMember(dest => dest.Garage, opt => opt.Ignore()); // Navigation property ignore
+            .ForMember(dest => dest.EntryTime, opt => opt.Ignore())
+            .ForMember(dest => dest.Garage, opt => opt.Ignore());
         
         CreateMap<City, CityUpdateDto>();
         CreateMap<Hotel, HotelUpdateDto>();
